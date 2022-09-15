@@ -68,7 +68,7 @@ module "cluster" {
   use_kms_s3                            = var.use_kms_s3
   s3_kms_arn                            = var.s3_kms_arn
   is_jx2                                = var.is_jx2
-  content                               = local.content
+ # content                               = local.content
   cluster_endpoint_public_access        = var.cluster_endpoint_public_access
   cluster_endpoint_public_access_cidrs  = var.cluster_endpoint_public_access_cidrs
   cluster_endpoint_private_access       = var.cluster_endpoint_private_access
@@ -110,60 +110,15 @@ module "cluster" {
 // Setup all required resources for using the  bank-vaults operator
 // See https://github.com/banzaicloud/bank-vaults
 // ----------------------------------------------------------------------------
-module "vault" {
-  source         = "./modules/vault"
-  cluster_name   = local.cluster_name
-  vault_user     = var.vault_user
-  force_destroy  = var.force_destroy
-  external_vault = local.external_vault
-  use_vault      = var.use_vault
-  region         = var.region
-}
+
 
 // ----------------------------------------------------------------------------
 // Setup all required resources for using Velero for cluster backups
 // ----------------------------------------------------------------------------
-module "backup" {
-  source = "./modules/backup"
 
-  enable_backup      = var.enable_backup
-  cluster_name       = local.cluster_name
-  force_destroy      = var.force_destroy
-  velero_username    = var.velero_username
-  create_velero_role = var.create_velero_role
-}
 
 // ----------------------------------------------------------------------------
 // Setup all required Route 53 resources if External DNS / Cert Manager is enabled
 // ----------------------------------------------------------------------------
-module "dns" {
-  source                         = "./modules/dns"
-  apex_domain                    = var.apex_domain
-  subdomain                      = var.subdomain
-  tls_email                      = var.tls_email
-  enable_external_dns            = var.enable_external_dns
-  create_and_configure_subdomain = var.create_and_configure_subdomain
-  force_destroy_subdomain        = var.force_destroy_subdomain
-  enable_tls                     = var.enable_tls
-  production_letsencrypt         = var.production_letsencrypt
-  manage_apex_domain             = var.manage_apex_domain
-  manage_subdomain               = var.manage_subdomain
-}
 
-module "health" {
-  source               = "./modules/health"
-  is_jx2               = var.is_jx2
-  install_kuberhealthy = var.install_kuberhealthy
-}
 
-module "nginx" {
-  source                 = "./modules/nginx"
-  is_jx2                 = var.is_jx2
-  create_nginx           = var.create_nginx
-  nginx_release_name     = var.nginx_release_name
-  nginx_namespace        = var.nginx_namespace
-  nginx_chart_version    = var.nginx_chart_version
-  create_nginx_namespace = var.create_nginx_namespace
-  nginx_values_file      = var.nginx_values_file
-
-}
